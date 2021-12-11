@@ -7,6 +7,7 @@ Currently it can:
  - Rewrite old Mono.Data.Sqlite calls to Sqlite.Data.SQLite
  - Rewrite OTAPI.Tile.ITile => Terraria.ITile
  - Rewrite TShockAPI.ConfigFile => TShockAPI.Configuration.TShockConfig
+ - Swap 32bit to 64bit to prevent bad format exceptions
 
 The rewrite process occurs before TShock is loaded when using as a ModFw plugin.
 

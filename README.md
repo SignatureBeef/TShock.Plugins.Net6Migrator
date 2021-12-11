@@ -19,3 +19,6 @@ TODO:
  - Test more [TShock plugins](https://github.com/Pryaxis/Plugins)
  - TShock & TSAPI on nuget - for easier automation of redirections
  - SQLite - upgrade/replace old incompatible connection strings
+
+
+NOTE: DO NOT EXPECT MANY PLUGINS TO WORK - THIS IS THE FIRST REVISION

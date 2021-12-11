@@ -4,7 +4,7 @@ A [ModFramework](https://github.com/DeathCradle/ModFramework.NET) plugin and pro
 Currently it can:
 
  - Rewrite old plugins based on .NET Framework (3.5, 4.5) to .NET 6 under simple scenarios (more scenarios will be added)
- - Rewrite old Mono.Data.Sqlite calls to Sqlite.Data.SQLite
+ - Rewrite old Mono.Data.Sqlite calls to System.Data.SQLite
  - Rewrite OTAPI.Tile.ITile => Terraria.ITile
  - Rewrite TShockAPI.ConfigFile => TShockAPI.Configuration.TShockConfig
  - Swap 32bit to 64bit to prevent bad format exceptions

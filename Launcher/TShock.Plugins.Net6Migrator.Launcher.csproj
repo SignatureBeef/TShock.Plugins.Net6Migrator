@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ModFramework" Version="1.0.28-alpha" />
+    <PackageReference Include="ModFramework" Version="1.0.31-alpha" />
     <PackageReference Include="MySql.Data" Version="8.0.27" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="OTAPI.Upcoming" Version="3.0.30-alpha" />

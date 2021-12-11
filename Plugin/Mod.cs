@@ -70,6 +70,9 @@ namespace TShock.Plugins.Net6Migrator
                 // relink to OTAPI.Tile.ITile => Terraria.ITile
                 mm.AddTask(new ITileRelinker(redirects["OTAPI"]));
 
+                // relink tshock config changes
+                mm.AddTask(new ConfigRelinker(redirects["TShockAPI"])); // todo launcher: get tshock to nuget, otherwise copy TShockAPI.dll to the redirects folder
+
                 // redirect assembly references
                 foreach (var reference in mm.Module.AssemblyReferences)
                 {

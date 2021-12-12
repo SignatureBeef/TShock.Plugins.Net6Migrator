@@ -22,3 +22,5 @@ TODO:
 
 
 NOTE: DO NOT EXPECT MANY PLUGINS TO WORK - THIS IS THE FIRST REVISION
+
+![image](https://user-images.githubusercontent.com/776327/145703175-423c2cf0-9d00-46f6-be68-cd0eb158c90d.png)

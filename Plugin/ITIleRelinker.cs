@@ -23,18 +23,25 @@ namespace TShock.Plugins.Net6Migrator
             this.Tile = this.Modder.Module.ImportReference(typeof(Terraria.ITile));
         }
 
-        public override TypeReference RelinkType(TypeReference typeReference)
+        public override void Relink(TypeDefinition type)
+        {
+            base.Relink(type);
+        }
+
+        public override bool RelinkType<TRef>(ref TRef typeReference)
         {
             if (typeReference.Name.Contains("ITileCollection"))
             {
-                return this.Collection;
+                typeReference = (TRef)this.Collection;
+                return true;
             }
             if (typeReference.Name.Equals("ITile"))
             {
-                return this.Tile;
+                typeReference = (TRef)this.Tile;
+                return true;
             }
 
-            return typeReference;
+            return false;
         }
 
         //public override void Relink(MethodBody body, Instruction instr)

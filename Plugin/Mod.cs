@@ -73,6 +73,12 @@ namespace TShock.Plugins.Net6Migrator
                 // relink tshock config changes
                 mm.AddTask(new ConfigRelinker(redirects["TShockAPI"])); // todo launcher: get tshock to nuget, otherwise copy TShockAPI.dll to the redirects folder
 
+                // relink TShock.Users to TShock.UserAccounts
+                mm.AddTask(new UserAccountRelinker(redirects["TShockAPI"]));
+
+                // relink TShock.Utils.FindPlayer to TSPlayer.FindByNameOrID
+                mm.AddTask(new FindPlayerRelinker(redirects["TShockAPI"]));
+
                 // redirect assembly references
                 foreach (var reference in mm.Module.AssemblyReferences)
                 {

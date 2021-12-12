@@ -1,17 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="ModFramework" Version="1.0.31-alpha" />
-    <PackageReference Include="OTAPI.Upcoming" Version="3.0.30-alpha" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="OTAPI.Upcoming" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="ModFramework" Version="1.0.34-alpha" />
+		<PackageReference Include="OTAPI.Upcoming" Version="3.0.30-alpha" />
+	</ItemGroup>
+	
 </Project>

@@ -25,6 +25,25 @@ DownloadZip("https://argo.sfo2.digitaloceanspaces.com/tshock/WorldRefill/WorldRe
 //DownloadZip("https://argo.sfo2.digitaloceanspaces.com/tshock/WorldMapper/WorldMapper-1.0.0.zip", LegacyPluginsFolder); cannot do this one, uses OTAPI hooks that would also need redirecting
 DownloadZip("https://files.catbox.moe/tfy6tb.zip", LegacyPluginsFolder); //NPCBlocker
 
+
+//DownloadZip("https://argo.sfo2.digitaloceanspaces.com/tshock/IRCRarria/IRCrarria-1.2.0.zip", LegacyPluginsFolder);
+//DownloadZip("https://argo.sfo2.digitaloceanspaces.com/tshock/TerrariaChatRelay/TerrariaChatRelay-0.9.2.zip", LegacyPluginsFolder);
+//DownloadZip("https://argo.sfo2.digitaloceanspaces.com/tshock/CustomMediumcore/CustomMediumcore-1.4.0.1.zip", LegacyPluginsFolder);
+//DownloadZip("https://argo.sfo2.digitaloceanspaces.com/tshock/Terracord/TerraCord-1.3.1.zip", LegacyPluginsFolder);
+//DownloadZip("https://argo.sfo2.digitaloceanspaces.com/tshock/Vanillafier/Vanillafier-1.0.0.zip", LegacyPluginsFolder);
+//DownloadZip("https://argo.sfo2.digitaloceanspaces.com/tshock/TDiffBackup/TDiffBackup.zip", LegacyPluginsFolder);
+
+DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/MultiScore/MultiSCore-1.5.4.dll", Path.Combine(LegacyPluginsFolder, "MultiSCore.dll"));
+DownloadFile("https://files.catbox.moe/hx1lqm.dll", Path.Combine(LegacyPluginsFolder, "AdditionalPylons.dll"));
+DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/JourneyMixer/JourneyMixer.dll", Path.Combine(LegacyPluginsFolder, "JourneyMixer.dll"));
+DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/InfiniteChestsV3/InfiniteChests-1.3.0.0.dll", Path.Combine(LegacyPluginsFolder, "InfiniteChests.dll"));
+DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/ZAdminCmds/ZAdminCmds.dll", Path.Combine(LegacyPluginsFolder, "ZAdminCmds.dll"));
+DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/AdvancedWarpplates/AdvancedWarpplates.dll", Path.Combine(LegacyPluginsFolder, "AdvancedWarpplates.dll"));
+DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/ShortCommands/ShortCommands.dll", Path.Combine(LegacyPluginsFolder, "ShortCommands.dll"));
+DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/FACommands/FACommands-1.7.1.dll", Path.Combine(LegacyPluginsFolder, "FACommands.dll"));
+DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/CreativeMode/CreativeMode.dll", Path.Combine(LegacyPluginsFolder, "CreativeMode.dll"));
+DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/TeamCommands/TeamCommands-1.2.dll", Path.Combine(LegacyPluginsFolder, "TeamCommands.dll"));
+
 Console.WriteLine($"Converting plugins from: {LegacyPluginsFolder}");
 
 var redirects = new Dictionary<string, AssemblyDefinition>()

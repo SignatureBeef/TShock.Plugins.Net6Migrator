@@ -46,27 +46,14 @@ DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/TeamCommands/TeamC
 
 Console.WriteLine($"Converting plugins from: {LegacyPluginsFolder}");
 
-var redirects = new Dictionary<string, AssemblyDefinition>()
-{
-    {"Mono.Data.Sqlite", AssemblyDefinition.ReadAssembly("System.Data.SQLite.dll")},
-    {"OTAPI", AssemblyDefinition.ReadAssembly("OTAPI.dll")},
-    {"MySql.Data", AssemblyDefinition.ReadAssembly("MySql.Data.dll") },
-    {"Newtonsoft.Json", AssemblyDefinition.ReadAssembly("Newtonsoft.Json.dll") },
-    //{"TShockAPI", AssemblyDefinition.ReadAssembly("tshock/TShockAPI.dll")},
-    //{"TerrariaServer", AssemblyDefinition.ReadAssembly("tshock/TerrariaServer.dll")},
-};
-
-foreach(var file in Directory.GetFiles(RedirectFolder, "*.dll"))
-{
-    var asm = AssemblyDefinition.ReadAssembly(file);
-    redirects[asm.Name.Name] = asm;
-}
-
-Mod.Migrate(LegacyPluginsFolder, ConvertedPluginsFolder, redirects);
-
+Mod.Migrate(LegacyPluginsFolder, ConvertedPluginsFolder);
 
 void DownloadFile(string url, string destination)
 {
+    var info = new FileInfo(destination);
+    if (info.Exists && (DateTime.Now - info.LastWriteTime).TotalMinutes < 30)
+        return;
+
     Console.Write($"Downloading {url}...");
     if (File.Exists(destination)) File.Delete(destination);
     var data = _httpClient.GetByteArrayAsync(url).Result;

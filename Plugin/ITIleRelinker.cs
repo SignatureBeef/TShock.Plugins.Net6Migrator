@@ -19,8 +19,17 @@ namespace TShock.Plugins.Net6Migrator
         public override void Registered()
         {
             base.Registered();
-            this.Collection = this.Modder.Module.ImportReference(typeof(ModFramework.ICollection<Terraria.ITile>));
-            this.Tile = this.Modder.Module.ImportReference(typeof(Terraria.ITile));
+
+            this.Tile = this.Modder.Module.ImportReference(OTAPI.MainModule.Types.Single(x => x.FullName == "Terraria.ITile"));
+            var collection_itile2 = this.Modder.Module.ImportReference(typeof(ModFramework.ICollection<object>));
+
+            var collection_itile = new GenericInstanceType(
+                this.Modder.Module.ImportReference(
+                    typeof(ModFramework.ICollection<>)
+                )
+            );
+            collection_itile.GenericArguments.Add(this.Tile);
+            this.Collection = collection_itile;
         }
 
         public override void Relink(TypeDefinition type)

@@ -44,6 +44,8 @@ DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/FACommands/FAComma
 DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/CreativeMode/CreativeMode.dll", Path.Combine(LegacyPluginsFolder, "CreativeMode.dll"));
 DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/TeamCommands/TeamCommands-1.2.dll", Path.Combine(LegacyPluginsFolder, "TeamCommands.dll"));
 
+DownloadZip("https://argo.sfo2.digitaloceanspaces.com/tshock/Vanillafier/Vanillafier-1.0.0.zip", LegacyPluginsFolder);
+
 Console.WriteLine($"Converting plugins from: {LegacyPluginsFolder}");
 
 Mod.Migrate(LegacyPluginsFolder, ConvertedPluginsFolder);
@@ -51,7 +53,7 @@ Mod.Migrate(LegacyPluginsFolder, ConvertedPluginsFolder);
 void DownloadFile(string url, string destination)
 {
     var info = new FileInfo(destination);
-    if (info.Exists && (DateTime.Now - info.LastWriteTime).TotalMinutes < 30)
+    if (info.Exists && info.Extension.ToLower() == ".dll" && (DateTime.Now - info.LastWriteTime).TotalMinutes < 30)
         return;
 
     Console.Write($"Downloading {url}...");

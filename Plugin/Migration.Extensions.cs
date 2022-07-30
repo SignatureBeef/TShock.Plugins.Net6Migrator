@@ -19,7 +19,7 @@ namespace TShock.Plugins.Net6Migrator
 
         public static void SetAnyCPU(this ModuleDefinition module)
         {
-            module.Architecture = TargetArchitecture.AMD64;
+            module.Architecture = TargetArchitecture.I386;
             module.Attributes = ModuleAttributes.ILOnly;
         }
     }

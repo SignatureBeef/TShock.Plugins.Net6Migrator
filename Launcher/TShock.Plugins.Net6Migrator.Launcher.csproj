@@ -9,6 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="ModFramework" Version="1.0.41-alpha" />
+    <PackageReference Include="MonoMod" Version="22.5.1.1" />
+    <PackageReference Include="MonoMod.RuntimeDetour.HookGen" Version="22.5.1.1" />
   </ItemGroup>
 
   <ItemGroup>

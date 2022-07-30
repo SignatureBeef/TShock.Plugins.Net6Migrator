@@ -1,4 +1,5 @@
 ﻿using Mono.Cecil;
+using Mono.Cecil.Cil;
 
 namespace TShock.Plugins.Net6Migrator
 {
@@ -20,7 +21,6 @@ namespace TShock.Plugins.Net6Migrator
             if (Modder is null) throw new NullReferenceException(nameof(Modder));
 
             Tile = Modder.Module.ImportReference(OTAPI.MainModule.Types.Single(x => x.FullName == "Terraria.ITile"));
-            var collection_itile2 = Modder.Module.ImportReference(typeof(ModFramework.ICollection<object>));
 
             var collection_itile = new GenericInstanceType(
                 Modder.Module.ImportReference(
@@ -29,6 +29,22 @@ namespace TShock.Plugins.Net6Migrator
             );
             collection_itile.GenericArguments.Add(Tile);
             Collection = collection_itile;
+        }
+
+        public override void Relink(MethodBody body, Instruction instr)
+        {
+            if (instr.OpCode == OpCodes.Callvirt && instr.Operand is MethodReference method && method.ReturnType.Name.Contains("ITile"))
+            {
+                if (method.DeclaringType.Name.Contains("ITileCollection"))
+                {
+                    if (method.Name == "get_Item")
+                    {
+                        if (Collection is null) throw new NullReferenceException(nameof(Collection));
+                        method.ReturnType = Collection.GetElementType().GenericParameters[0];
+                    }
+                }
+            }
+            base.Relink(body, instr);
         }
 
         public override bool RelinkType<TRef>(ref TRef typeReference)

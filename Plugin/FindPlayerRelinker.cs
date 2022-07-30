@@ -7,21 +7,23 @@ namespace TShock.Plugins.Net6Migrator
     public class FindPlayerRelinker : ModFramework.Relinker.RelinkTask
     {
         public AssemblyDefinition TShock { get; set; }
-        public TypeDefinition TSPlayerClass { get; set; }
-        public TypeReference TSPlayer { get; set; }
-        public MethodReference FindByNameOrID { get; set; }
+        public TypeDefinition? TSPlayerClass { get; set; }
+        public TypeReference? TSPlayer { get; set; }
+        public MethodReference? FindByNameOrID { get; set; }
         public FindPlayerRelinker(AssemblyDefinition tshock) : base()
         {
-            this.TShock = tshock;
+            TShock = tshock;
         }
 
         public override void Registered()
         {
             base.Registered();
-            this.TSPlayer = this.Modder.Module.ImportReference(
+            if (Modder is null) throw new NullReferenceException(nameof(Modder));
+
+            TSPlayer = Modder.Module.ImportReference(
                 TSPlayerClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.TSPlayer")
             );
-            this.FindByNameOrID = this.Modder.Module.ImportReference(
+            FindByNameOrID = Modder.Module.ImportReference(
                 TSPlayerClass.Methods.Single(m => m.Name == "FindByNameOrID")
             );
         }
@@ -35,10 +37,14 @@ namespace TShock.Plugins.Net6Migrator
                 if (mref.DeclaringType.FullName == "TShockAPI.Utils" && mref.Name == "FindPlayer")
                 {
                     var ldsfld = instr.Previous(x => x.OpCode == OpCodes.Ldsfld && x.Operand is FieldReference fref && fref.Name == "Utils");
+
+                    if (ldsfld is null) throw new NullReferenceException(nameof(ldsfld));
+                    if (FindByNameOrID is null) throw new NullReferenceException(nameof(FindByNameOrID));
+
                     ldsfld.OpCode = OpCodes.Nop;
                     ldsfld.Operand = null;
-                    mref.DeclaringType = this.TSPlayer;
-                    mref.Name = this.FindByNameOrID.Name;
+                    mref.DeclaringType = TSPlayer;
+                    mref.Name = FindByNameOrID.Name;
                 }
             }
         }

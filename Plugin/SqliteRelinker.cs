@@ -9,7 +9,7 @@ namespace TShock.Plugins.Net6Migrator
         public AssemblyDefinition Sqlite { get; set; }
         public SqliteRelinker(AssemblyDefinition sqlite) : base()
         {
-            this.Sqlite = sqlite;
+            Sqlite = sqlite;
         }
 
         public override void Relink(MethodBody body, Instruction instr)

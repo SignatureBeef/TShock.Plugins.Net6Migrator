@@ -49,11 +49,11 @@ namespace TShock.Plugins.Net6Migrator
                 Stream = stream;
             }
         }
-        static Dictionary<string, IEnumerable<PackageSource>?> GetRedirectAsyncCache = new();
-        static async Task<IEnumerable<PackageSource>?> GetRedirectAsync(string packageName, string? packageVersion = null, bool includePreReleases = false)
+        static Dictionary<string, IEnumerable<PackageSource>?> _resolvePackageCache = new();
+        static async Task<IEnumerable<PackageSource>?> ResolvePackageAsync(string packageName, string? packageVersion = null, bool includePreReleases = false)
         {
             var key = packageName + (packageVersion ?? "latest");
-            if (GetRedirectAsyncCache.TryGetValue(key, out IEnumerable<PackageSource>? stream))
+            if (_resolvePackageCache.TryGetValue(key, out IEnumerable<PackageSource>? stream))
             {
                 if (stream is not null)
                     foreach (var srm in stream)
@@ -86,7 +86,7 @@ namespace TShock.Plugins.Net6Migrator
 
             if (version is null)
             {
-                GetRedirectAsyncCache[key] = null;
+                _resolvePackageCache[key] = null;
                 return null;
             }
 
@@ -99,7 +99,7 @@ namespace TShock.Plugins.Net6Migrator
                 NullLogger.Instance,
                 CancellationToken.None);
 
-            GetRedirectAsyncCache[key] = streams;
+            _resolvePackageCache[key] = streams;
 
             if (packageStream.Length > 0)
                 streams.Add(new PackageSource(packageName, packageStream));
@@ -113,7 +113,7 @@ namespace TShock.Plugins.Net6Migrator
             {
                 foreach (var package in dependency.Packages)
                 {
-                    if (GetRedirectAsyncCache.TryGetValue(package.Id, out IEnumerable<PackageSource>? existing))
+                    if (_resolvePackageCache.TryGetValue(package.Id, out IEnumerable<PackageSource>? existing))
                         continue;
 
                     MemoryStream depStream = new();
@@ -133,9 +133,9 @@ namespace TShock.Plugins.Net6Migrator
             return streams;
         }
 
-        static AssemblyDefinition GetRequiredRedirect(string packageName, bool includePreReleases = false, string? assemblyName = null)
+        static AssemblyDefinition ResolvePackageAssembly(string packageName, bool includePreReleases = false, string? assemblyName = null)
         {
-            var def = GetRedirect(packageName, includePreReleases, assemblyName);
+            var def = ResolvePackagePath(packageName, includePreReleases, assemblyName);
             if (def is null) throw new Exception($"Failed to resolve package: {packageName}");
             return def;
         }
@@ -232,7 +232,7 @@ namespace TShock.Plugins.Net6Migrator
             return packageName;
         }
 
-        static AssemblyDefinition? GetRedirect(string packageName, bool includePreReleases = false, string? assemblyName = null)
+        static AssemblyDefinition? ResolvePackagePath(string packageName, bool includePreReleases = false, string? assemblyName = null)
         {
             packageName = GetRedirection(packageName);
             if (assemblyName is not null)
@@ -242,6 +242,9 @@ namespace TShock.Plugins.Net6Migrator
 
             if (_redirects.TryGetValue(fileName, out AssemblyDefinition? asm))
                 return asm;
+
+            if (packageName.StartsWith("System.*"))
+                return null;
 
             // is it on disk?
             {
@@ -279,7 +282,7 @@ namespace TShock.Plugins.Net6Migrator
             // else resolve it from nuget
 
             Directory.CreateDirectory("dependencies");
-            var packages = GetRedirectAsync(packageName, packageVersion: packageVersion, includePreReleases: includePreReleases).Result;
+            var packages = ResolvePackageAsync(packageName, packageVersion: packageVersion, includePreReleases: includePreReleases).Result;
             if (packages is not null)
             {
                 foreach (var package in packages)
@@ -338,9 +341,9 @@ namespace TShock.Plugins.Net6Migrator
 
         public static void Migrate(string sourceFolder, string outputFolder)
         {
-            OTAPI = GetRequiredRedirect("OTAPI.Upcoming", includePreReleases: true, assemblyName: "OTAPI");
-            TShock = GetRequiredRedirect("TShockAPI");
-            TerrariaServer = GetRequiredRedirect("TerrariaServer");
+            OTAPI = ResolvePackageAssembly("OTAPI.Upcoming", includePreReleases: true, assemblyName: "OTAPI");
+            TShock = ResolvePackageAssembly("TShockAPI");
+            TerrariaServer = ResolvePackageAssembly("TerrariaServer");
 
             Directory.CreateDirectory("dependencies");
             var otapi_embedded = Path.Combine("dependencies", "otapi");
@@ -370,7 +373,7 @@ namespace TShock.Plugins.Net6Migrator
                     //GACPaths = new string[] { }, // avoid MonoMod looking up the GAC, which causes an exception on .netcore
                 };
 
-                mm.AssemblyResolver.ResolveFailure += (s, e) => GetRedirect(e.Name);
+                mm.AssemblyResolver.ResolveFailure += (s, e) => ResolvePackagePath(e.Name);
 
                 mm.Read();
                 mm.MapDependencies();
@@ -382,24 +385,24 @@ namespace TShock.Plugins.Net6Migrator
                 mm.AddTask(new CoreLibRelinker());
 
                 // relink some sqlite calls. this has only been tested in a couple plugins under limited conditions. more conditions are likely needed.
-                mm.AddTask(new SqliteRelinker(GetRequiredRedirect("Microsoft.Data.Sqlite")));
+                mm.AddTask(new SqliteRelinker(ResolvePackageAssembly("Microsoft.Data.Sqlite")));
 
                 // relink to OTAPI.Tile.ITile => Terraria.ITile
                 mm.AddTask(new ITileRelinker(OTAPI));
 
                 // relink tshock config changes
-                mm.AddTask(new ConfigRelinker(GetRequiredRedirect("TShockAPI"))); // todo launcher: get tshock to nuget, otherwise copy TShockAPI.dll to the redirects folder
+                mm.AddTask(new ConfigRelinker(ResolvePackageAssembly("TShockAPI"))); // todo launcher: get tshock to nuget, otherwise copy TShockAPI.dll to the redirects folder
 
                 // relink TShock.Users to TShock.UserAccounts
-                mm.AddTask(new UserAccountRelinker(GetRequiredRedirect("TShockAPI")));
+                mm.AddTask(new UserAccountRelinker(ResolvePackageAssembly("TShockAPI")));
 
                 // relink TShock.Utils.FindPlayer to TSPlayer.FindByNameOrID
-                mm.AddTask(new FindPlayerRelinker(GetRequiredRedirect("TShockAPI")));
+                mm.AddTask(new FindPlayerRelinker(ResolvePackageAssembly("TShockAPI")));
 
                 // redirect assembly references
                 foreach (var reference in mm.Module.AssemblyReferences)
                 {
-                    var match = GetRedirect(reference.Name);
+                    var match = ResolvePackagePath(reference.Name);
                     if (match is not null)
                     {
                         reference.Name = match.Name.Name;

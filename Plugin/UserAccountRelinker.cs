@@ -1,5 +1,4 @@
-﻿using ModFramework;
-using Mono.Cecil;
+﻿using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace TShock.Plugins.Net6Migrator
@@ -8,33 +7,35 @@ namespace TShock.Plugins.Net6Migrator
     {
         public AssemblyDefinition TShock { get; set; }
 
-        public TypeDefinition TShockClass { get; set; }
-        public TypeDefinition UserAccountManagerClass { get; set; }
-        public TypeReference UserAccountManager { get; set; }
-        public FieldReference UserAccounts { get; set; }
-        public MethodReference GetUserAccountByName { get; set; }
-        public TypeDefinition UserAccountClass { get; set; }
-        public TypeReference UserAccount{ get; set; }
+        public TypeDefinition? TShockClass { get; set; }
+        public TypeDefinition? UserAccountManagerClass { get; set; }
+        public TypeReference? UserAccountManager { get; set; }
+        public FieldReference? UserAccounts { get; set; }
+        public MethodReference? GetUserAccountByName { get; set; }
+        public TypeDefinition? UserAccountClass { get; set; }
+        public TypeReference? UserAccount{ get; set; }
 
         public UserAccountRelinker(AssemblyDefinition tshock) : base()
         {
-            this.TShock = tshock;
+            TShock = tshock;
         }
 
         public override void Registered()
         {
             base.Registered();
-            this.UserAccountManager = this.Modder.Module.ImportReference(
+            if (Modder is null) throw new NullReferenceException(nameof(Modder));
+
+            UserAccountManager = Modder.Module.ImportReference(
                 UserAccountManagerClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.DB.UserAccountManager")
             );
-            this.UserAccount = this.Modder.Module.ImportReference(
+            UserAccount = Modder.Module.ImportReference(
                 UserAccountClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.DB.UserAccount")
             );
             TShockClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.TShock");
-            this.UserAccounts = this.Modder.Module.ImportReference(
+            UserAccounts = Modder.Module.ImportReference(
                 TShockClass.Fields.Single(f => f.Name == "UserAccounts")
             );
-            this.GetUserAccountByName = this.Modder.Module.ImportReference(
+            GetUserAccountByName = Modder.Module.ImportReference(
                 UserAccountManagerClass.Methods.Single(f => f.Name == "GetUserAccountByName")
             );
         }
@@ -43,11 +44,13 @@ namespace TShock.Plugins.Net6Migrator
         {
             if (typeReference.FullName == "TShockAPI.DB.UserManager")
             {
+                if (UserAccountManager is null) throw new NullReferenceException(nameof(UserAccountManager));
                 typeReference = (TRef)UserAccountManager;
                 return true;
             }
             if (typeReference.FullName == "TShockAPI.DB.User")
             {
+                if (UserAccount is null) throw new NullReferenceException(nameof(UserAccount));
                 typeReference = (TRef)UserAccount;
                 return true;
             }
@@ -61,17 +64,14 @@ namespace TShock.Plugins.Net6Migrator
 
             if (instr.Operand is MethodReference methodReference)
             {
-                //if (methodReference.DeclaringType.FullName == "TShockAPI.DB.UserManager")
-                //{
-                //    methodReference.DeclaringType = this.UserAccountManager;
-                //}
-                if (methodReference.DeclaringType.FullName == this.UserAccountManager.FullName || methodReference.DeclaringType.FullName == "TShockAPI.DB.UserManager")
+                if (methodReference.DeclaringType.FullName == UserAccountManager?.FullName || methodReference.DeclaringType.FullName == "TShockAPI.DB.UserManager")
                 {
+                    if (GetUserAccountByName is null) throw new NullReferenceException(nameof(GetUserAccountByName));
                     if (methodReference.Name == "GetUserByName")
                         methodReference.Name = GetUserAccountByName.Name;
                 }
 
-                if (methodReference.ReturnType.FullName == this.UserAccount.FullName || methodReference.ReturnType.FullName == "TShockAPI.DB.User")
+                if (methodReference.ReturnType.FullName == UserAccount?.FullName || methodReference.ReturnType.FullName == "TShockAPI.DB.User")
                 {
                     if (methodReference.Name == "get_User")
                         methodReference.Name = "get_Account";
@@ -82,7 +82,7 @@ namespace TShock.Plugins.Net6Migrator
             {
                 if (fieldReference.DeclaringType.FullName == "TShockAPI.TShock" && fieldReference.Name == "Users")
                 {
-                    instr.Operand = this.UserAccounts;
+                    instr.Operand = UserAccounts;
                 }
             }
         }

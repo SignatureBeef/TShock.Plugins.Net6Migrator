@@ -1,5 +1,4 @@
-﻿using ModFramework;
-using Mono.Cecil;
+﻿using Mono.Cecil;
 using Mono.Cecil.Cil;
 
 namespace TShock.Plugins.Net6Migrator
@@ -8,27 +7,29 @@ namespace TShock.Plugins.Net6Migrator
     {
         public AssemblyDefinition TShock { get; set; }
 
-        public TypeDefinition ConfigClass { get; set; }
-        public TypeReference Config { get; set; }
-        public TypeReference TShockSettings { get; set; }
+        public TypeDefinition? ConfigClass { get; set; }
+        public TypeReference? Config { get; set; }
+        public TypeReference? TShockSettings { get; set; }
 
-        public TypeReference ConfigFile { get; set; }
+        public TypeReference? ConfigFile { get; set; }
 
         public ConfigRelinker(AssemblyDefinition tshock) : base()
         {
-            this.TShock = tshock;
+            TShock = tshock;
         }
 
         public override void Registered()
         {
             base.Registered();
-            this.Config = this.Modder.Module.ImportReference(
+
+            if (Modder is null) throw new NullReferenceException(nameof(Modder));
+            Config = Modder.Module.ImportReference(
                 ConfigClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.Configuration.TShockConfig")
             );
-            this.TShockSettings = this.Modder.Module.ImportReference(
+            TShockSettings = Modder.Module.ImportReference(
                 TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.Configuration.TShockSettings")
             );
-            this.ConfigFile = this.Modder.Module.ImportReference(
+            ConfigFile = Modder.Module.ImportReference(
                 ConfigClass.BaseType
             );
         }
@@ -37,7 +38,8 @@ namespace TShock.Plugins.Net6Migrator
         {
             if (typeReference.FullName == "TShockAPI.ConfigFile")
             {
-                typeReference = (TRef)this.Config;
+                if (Config is null) throw new NullReferenceException(nameof(Config));
+                typeReference = (TRef)Config;
                 return true;
             }
 
@@ -52,17 +54,17 @@ namespace TShock.Plugins.Net6Migrator
                     fieldReference.DeclaringType.FullName == "TShockAPI.ConfigFile"
                     || fieldReference.DeclaringType.FullName == "TShockAPI.Configuration.TShockConfig"
                 )
-                //&& fieldReference.Name == "StorageType"
                 && instr.Previous.OpCode != OpCodes.Callvirt
             )
             {
-                var prm = this.ConfigFile.GetElementType().GenericParameters.Single();
-                var mref = new MethodReference("get_Settings", prm, this.ConfigFile);
+                if (ConfigFile is null) throw new NullReferenceException(nameof(ConfigFile));
+                var prm = ConfigFile.GetElementType().GenericParameters.Single();
+                var mref = new MethodReference("get_Settings", prm, ConfigFile);
                 mref.HasThis = true;
 
                 var newinstr = Instruction.Create(OpCodes.Callvirt, mref);
                 body.GetILProcessor().InsertBefore(instr, newinstr);
-                fieldReference.DeclaringType = this.TShockSettings;
+                fieldReference.DeclaringType = TShockSettings;
             }
         }
     }

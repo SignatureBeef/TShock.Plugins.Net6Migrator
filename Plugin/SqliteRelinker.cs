@@ -19,7 +19,7 @@ namespace TShock.Plugins.Net6Migrator
             {
                 if (mref.DeclaringType.Name == "SqliteConnection")
                 {
-                    var conn = Sqlite.MainModule.Types.Single(x => x.FullName == "System.Data.SQLite.SQLiteConnection");
+                    var conn = Sqlite.MainModule.Types.Single(x => x.FullName == "Microsoft.Data.Sqlite.SqliteConnection");
                     var ctor = conn.Methods.Single(m => m.Name == ".ctor" && m.SignatureMatches(mref));
                     instr.Operand = body.Method.Module.ImportReference(ctor);
                 }

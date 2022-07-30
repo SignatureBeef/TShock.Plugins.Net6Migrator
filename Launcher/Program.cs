@@ -14,7 +14,7 @@ Directory.CreateDirectory(RedirectFolder);
 ////DownloadFile("https://github.com/Pryaxis/TShock/suites/4613019714/artifacts/124705991", Path.Combine(LegacyPluginsFolder, "TShockAPI.dll"));
 DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/AutoTeam/AutoTeam-1.0.0.dll", Path.Combine(LegacyPluginsFolder, "AutoTeam.dll"));
 DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/Tiled/Tiled-1.4.0.0.dll", Path.Combine(LegacyPluginsFolder, "Tiled.dll"));
-DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/Crossplay/Crossplay-1.7.0.dll", Path.Combine(LegacyPluginsFolder, "Crossplay.dll"));
+DownloadFile("https://github.com/Moneylover3246/Crossplay/releases/download/1.10.2/Crossplay.dll", Path.Combine(LegacyPluginsFolder, "Crossplay.dll"));
 DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/EssentialsPlus/EssentialsPlus.dll", Path.Combine(LegacyPluginsFolder, "EssentialsPlus.dll"));
 DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/InvincibleTiles/InvincibleTiles-1.0.0.dll", Path.Combine(LegacyPluginsFolder, "InvincibleTiles.dll"));
 DownloadFile("https://argo.sfo2.digitaloceanspaces.com/tshock/TServerWeb/TSWVote.dll", Path.Combine(LegacyPluginsFolder, "TSWVote.dll"));

@@ -20,7 +20,7 @@ public class Mod
     [Modification(ModType.Runtime, "Migrating legacy plugins")]
     public static void OnRunning()
     {
-        var root = Environment.CurrentDirectory;
+        var root = AppContext.BaseDirectory;
         var serverPlugins = Path.Combine(root, "ServerPlugins");
 
         Migrate(serverPlugins, serverPlugins);

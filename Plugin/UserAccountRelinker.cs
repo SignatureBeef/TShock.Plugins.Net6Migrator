@@ -32,19 +32,29 @@ public class UserAccountRelinker : ModFramework.Relinker.TypeRelinker
         base.Registered();
         if (Modder is null) throw new NullReferenceException(nameof(Modder));
 
-        UserAccountManager = Modder.Module.ImportReference(
-            UserAccountManagerClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.DB.UserAccountManager")
-        );
-        UserAccount = Modder.Module.ImportReference(
-            UserAccountClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.DB.UserAccount")
-        );
-        TShockClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.TShock");
-        UserAccounts = Modder.Module.ImportReference(
-            TShockClass.Fields.Single(f => f.Name == "UserAccounts")
-        );
-        GetUserAccountByName = Modder.Module.ImportReference(
-            UserAccountManagerClass.Methods.Single(f => f.Name == "GetUserAccountByName")
-        );
+        Modder.ModContext.OnApply += OnApply;
+    }
+
+    private ModContext.EApplyResult OnApply(ModType modType, ModFwModder? modder)
+    {
+        if (modType == ModType.Read)
+        {
+            UserAccountManager = Modder.Module.ImportReference(
+                UserAccountManagerClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.DB.UserAccountManager")
+            );
+            UserAccount = Modder.Module.ImportReference(
+                UserAccountClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.DB.UserAccount")
+            );
+            TShockClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.TShock");
+            UserAccounts = Modder.Module.ImportReference(
+                TShockClass.Fields.Single(f => f.Name == "UserAccounts")
+            );
+            GetUserAccountByName = Modder.Module.ImportReference(
+                UserAccountManagerClass.Methods.Single(f => f.Name == "GetUserAccountByName")
+            );
+        }
+
+        return ModContext.EApplyResult.Continue;
     }
 
     public override bool RelinkType<TRef>(ref TRef typeReference)

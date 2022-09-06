@@ -28,17 +28,27 @@ public class ConfigRelinker : ModFramework.Relinker.TypeRelinker
     public override void Registered()
     {
         base.Registered();
-
         if (Modder is null) throw new NullReferenceException(nameof(Modder));
-        Config = Modder.Module.ImportReference(
-            ConfigClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.Configuration.TShockConfig")
-        );
-        TShockSettings = Modder.Module.ImportReference(
-            TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.Configuration.TShockSettings")
-        );
-        ConfigFile = Modder.Module.ImportReference(
-            ConfigClass.BaseType
-        );
+
+        Modder.ModContext.OnApply += OnApply;
+    }
+
+    private ModContext.EApplyResult OnApply(ModType modType, ModFwModder? modder)
+    {
+        if (modType == ModType.Read)
+        {
+            Config = Modder.Module.ImportReference(
+                ConfigClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.Configuration.TShockConfig")
+            );
+            TShockSettings = Modder.Module.ImportReference(
+                TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.Configuration.TShockSettings")
+            );
+            ConfigFile = Modder.Module.ImportReference(
+                ConfigClass.BaseType
+            );
+        }
+
+        return ModContext.EApplyResult.Continue;
     }
 
     public override bool RelinkType<TRef>(ref TRef typeReference)

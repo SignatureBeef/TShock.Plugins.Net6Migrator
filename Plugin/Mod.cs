@@ -171,7 +171,7 @@ public class Mod
         if (_redirects.TryGetValue(fileName, out AssemblyDefinition? asm))
             return asm;
 
-        if (packageName.StartsWith("System.*"))
+        if (packageName.StartsWith("System."))
             return null;
 
         // is it on disk?
@@ -304,12 +304,6 @@ public class Mod
 
             mm.AssemblyResolver.ResolveFailure += (s, e) => ResolvePackagePath(e.Name);
 
-            mm.Read();
-            mm.MapDependencies();
-
-            // switch to AnyCPU (64 bit). some plugins are using 32bit only
-            mm.Module.SetAnyCPU();
-
             // relink to corelib
             mm.AddTask<CoreLibRelinker>();
 
@@ -327,6 +321,12 @@ public class Mod
 
             // relink TShock.Utils.FindPlayer to TSPlayer.FindByNameOrID
             mm.AddFindPlayerRelinker(ResolvePackageAssembly("TShockAPI"));
+
+            mm.Read();
+            mm.MapDependencies();
+
+            // switch to AnyCPU (64 bit). some plugins are using 32bit only
+            mm.Module.SetAnyCPU();
 
             // redirect assembly references
             foreach (var reference in mm.Module.AssemblyReferences)

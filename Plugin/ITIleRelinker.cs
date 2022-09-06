@@ -27,15 +27,25 @@ public class ITileRelinker : ModFramework.Relinker.TypeRelinker
         base.Registered();
         if (Modder is null) throw new NullReferenceException(nameof(Modder));
 
-        Tile = Modder.Module.ImportReference(OTAPI.MainModule.Types.Single(x => x.FullName == "Terraria.ITile"));
+        Modder.ModContext.OnApply += OnApply;
+    }
 
-        var collection_itile = new GenericInstanceType(
-            Modder.Module.ImportReference(
-                typeof(ModFramework.ICollection<>)
-            )
-        );
-        collection_itile.GenericArguments.Add(Tile);
-        Collection = collection_itile;
+    private ModContext.EApplyResult OnApply(ModType modType, ModFwModder? modder)
+    {
+        if (modType == ModType.Read)
+        {
+            Tile = Modder.Module.ImportReference(OTAPI.MainModule.Types.Single(x => x.FullName == "Terraria.ITile"));
+
+            var collection_itile = new GenericInstanceType(
+                Modder.Module.ImportReference(
+                    typeof(ModFramework.ICollection<>)
+                )
+            );
+            collection_itile.GenericArguments.Add(Tile);
+            Collection = collection_itile;
+        }
+
+        return ModContext.EApplyResult.Continue;
     }
 
     public override void Relink(MethodBody body, Instruction instr)

@@ -27,12 +27,22 @@ public class FindPlayerRelinker : ModFramework.Relinker.RelinkTask
         base.Registered();
         if (Modder is null) throw new NullReferenceException(nameof(Modder));
 
-        TSPlayer = Modder.Module.ImportReference(
-            TSPlayerClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.TSPlayer")
-        );
-        FindByNameOrID = Modder.Module.ImportReference(
-            TSPlayerClass.Methods.Single(m => m.Name == "FindByNameOrID")
-        );
+        Modder.ModContext.OnApply += OnApply;
+    }
+
+    private ModContext.EApplyResult OnApply(ModType modType, ModFwModder? modder)
+    {
+        if (modType == ModType.Read)
+        {
+            TSPlayer = Modder.Module.ImportReference(
+                TSPlayerClass = TShock.MainModule.Types.Single(x => x.FullName == "TShockAPI.TSPlayer")
+            );
+            FindByNameOrID = Modder.Module.ImportReference(
+                TSPlayerClass.Methods.Single(m => m.Name == "FindByNameOrID")
+            );
+        }
+
+        return ModContext.EApplyResult.Continue;
     }
 
     public override void Relink(MethodBody body, Instruction instr)

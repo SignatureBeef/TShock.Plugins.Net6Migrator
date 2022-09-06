@@ -16,10 +16,4 @@ public static class MigrationExtensions
     public static bool IsNet6(this AssemblyDefinition assembly) => assembly.GetTargetFramework()?.Contains(".NETCoreApp,Version=v6.") == true;
     public static bool IsNetCore(this AssemblyDefinition assembly) => assembly.GetTargetFramework()?.Contains(".NETCoreApp") == true;
     public static bool IsNetFramework(this AssemblyDefinition assembly) => assembly.GetTargetFramework()?.Contains(".NETFramework") == true;
-
-    public static void SetAnyCPU(this ModuleDefinition module)
-    {
-        module.Architecture = TargetArchitecture.I386;
-        module.Attributes = ModuleAttributes.ILOnly;
-    }
 }
